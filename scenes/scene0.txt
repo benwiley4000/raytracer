@@ -5,7 +5,7 @@ fov: 60
 f: 1000
 a: 1.33
 model
-"HeightMap.obj"
+"map.obj"
 amb: 0.5 0.2 0.7
 dif: 0.2 0.4 0.2
 spe: 0.1 0.7 0.2
