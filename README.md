@@ -19,10 +19,10 @@ See [Building and running the project](docs/building.md).
 Beyond the C++ standard library this application relies on:
 * GLM
 * STB (particularly the stb_image.h header library)
+* tinyobjloader
 
 (Following standard setup procedure in a CMake-compatible IDE should fetch all these dependencies for you, so you shouldn't need to download them separately.)
 
 ### Other help
 
 * Cross platform CMake setup created using [Hunter](https://github.com/ruslo/hunter)
-* OBJ loader adapted from [opengl-tutorial.org](http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/)

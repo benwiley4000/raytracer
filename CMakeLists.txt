@@ -40,9 +40,6 @@ find_package(glm REQUIRED)
 # Add executables
 add_executable(raytracer
     src/main.cpp
-    src/objloader.hpp
-    src/objloader.cpp
-    src/utils.hpp
 )
 
 # Link libraries
