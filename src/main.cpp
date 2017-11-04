@@ -1,3 +1,4 @@
+#include <glm/glm.hpp>
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -5,6 +6,9 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <vector>
+
+#include "objects/ObjModel.hpp"
 
 // run in separate thread
 void raytrace_scene();
@@ -19,6 +23,14 @@ bool done = false;
 
 int main()
 {
+	ObjModel model(
+		"../models/map.obj",
+		glm::vec3(0.5f, 0.5f, 0.6f),
+		glm::vec3(0.2f, 0.6f, 0.8f),
+		glm::vec3(0.5f, 0.5f, 0.3f),
+		20.0f
+	);
+
 	t = std::thread(raytrace_scene);
 	std::string trash; // input that won't get used
 	while (!done) {
