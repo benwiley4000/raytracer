@@ -31,7 +31,8 @@ int main()
 void raytrace_scene()
 {
 	std::chrono::seconds trace_duration(1);
-	std::chrono::microseconds wait_duration(1);
+	std::chrono::microseconds wait_duration(100);
+
 	mut.lock();
 	while (!done) {
 		std::cout << "Ray tracing scene... (enter any input to pause)" << std::endl;
@@ -45,8 +46,8 @@ void raytrace_scene()
 
 void wait_for_input()
 {
-	mut.lock();
 	std::cout << "Pausing ray trace..." << std::endl;
+	mut.lock();
 	std::cout << "Enter 'q' to quit or anything else to continue." << std::endl;
 	auto c = (char)getchar();
 	if (c == 'q' || c == 'Q') {
