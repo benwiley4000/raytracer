@@ -8,6 +8,10 @@ Works on macOS and Linux. Should work for Windows, but not recently tested.
 
 TBA
 
+## Specifying scenes
+
+See [Scene description format](docs/scenes.md).
+
 ## Building
 
 See [Building and running the project](docs/building.md).
