@@ -12,6 +12,13 @@
 
 #include "objects/ObjModel.hpp"
 
+namespace fs = boost::filesystem;
+
+std::string scenes_dir = "../scenes";
+
+// run in main thread
+std::string getSceneFilename();
+
 // run in separate thread
 void raytraceScene();
 
@@ -25,6 +32,11 @@ bool done = false;
 
 int main()
 {
+	std::string scene_filename = getSceneFilename();
+
+	// Print blank line before beginning ray tracing
+	std::cout << std::endl;
+
 	ObjModel model(
 		"../models/map.obj",
 		glm::vec3(0.5f, 0.5f, 0.6f),
@@ -34,12 +46,50 @@ int main()
 	);
 
 	t = std::thread(raytraceScene);
+
+	std::cin.clear(); // clear inputs that could be read immediately
+	std::cin.ignore();
+
 	std::string trash; // input that won't get used
 	while (!done) {
 		std::getline(std::cin, trash); // wait for user to hit enter
 		waitForInput();
 	}
 	return 0;
+}
+
+std::string getSceneFilename()
+{
+	if (!fs::is_directory(scenes_dir)) {
+		std::cerr << scenes_dir << " is not a directory!" << std::endl;
+		exit(-1);
+	}
+
+	std::vector<std::string> filenames;
+	fs::directory_iterator itr{fs::path(scenes_dir)};
+	// iterate scenes directory to populate filenames vector
+	while (itr != fs::directory_iterator{}) {
+		if (fs::is_regular_file(itr->path())) {
+			filenames.push_back(itr->path().string());
+		}
+		++itr;
+	}
+
+	int option = -1;
+	// prompt user to select one of the scene files
+	while (option < 0 || option >= filenames.size()) {
+		std::cout << "Select a scene file from the options below." << std::endl;
+		for (size_t i = 0, len = filenames.size(); i < len; i++) {
+			std::cout << "[" << i << "] ";
+			// trim the scenes directory path off the front of the filename for printing
+			std::cout << filenames[i].substr(scenes_dir.length() + 1) << std::endl;
+		}
+		std::cout << "Your selection: ";
+		std::cin >> option;
+	}
+
+	std::cout << std::endl << "Scene " << filenames[option] << " selected." << std::endl;
+	return filenames[option];
 }
 
 void raytraceScene()
