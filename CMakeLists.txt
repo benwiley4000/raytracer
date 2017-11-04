@@ -33,9 +33,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Download dependencies
 hunter_add_package(glm)
+hunter_add_package(Boost COMPONENTS system filesystem)
 
 # Find dependencies
 find_package(glm REQUIRED)
+find_package(Boost CONFIG REQUIRED system filesystem)
 
 # Add executables
 add_executable(raytracer
@@ -50,3 +52,4 @@ add_executable(raytracer
 
 # Link libraries
 target_link_libraries(raytracer glm)
+target_link_libraries(raytracer Boost::system Boost::filesystem)

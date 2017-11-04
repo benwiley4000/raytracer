@@ -1,4 +1,6 @@
 #include <glm/glm.hpp>
+#include <boost/filesystem.hpp>
+
 #include <iostream>
 #include <cstdio>
 #include <string>
