@@ -40,7 +40,13 @@ find_package(glm REQUIRED)
 # Add executables
 add_executable(raytracer
     src/main.cpp
-    src/objects/Object3D.cpp src/objects/Object3D.hpp src/objects/Triangle.cpp src/objects/Triangle.hpp src/objects/ObjModel.cpp src/objects/ObjModel.hpp)
+    src/objects/Object3D.hpp
+    src/objects/Object3D.cpp
+    src/objects/Triangle.hpp
+    src/objects/Triangle.cpp
+    src/objects/ObjModel.hpp
+    src/objects/ObjModel.cpp
+)
 
 # Link libraries
 target_link_libraries(raytracer glm)
