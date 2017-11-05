@@ -19,7 +19,7 @@
 namespace fs = boost::filesystem;
 
 namespace scl {
-	using scene_attribute = boost::variant<glm::vec3, float>;
+	typedef boost::variant<glm::vec3, float> scene_attribute;
 
 	static std::string v1 = "v1";
 	static std::string v2 = "v2";
@@ -32,6 +32,8 @@ namespace scl {
 	static std::string f = "f";
 	static std::string a = "a";
 	static std::string rad = "rad";
+	static std::string pos = "pos";
+	static std::string nor = "nor";
 
 	bool isFloatAttribute(const std::string& fieldname)
 	{
