@@ -7,7 +7,7 @@ Scene files should be placed in the [`scenes/`](../scenes/) directory before run
 Here is an example:
 
 ```txt
-4
+5
 camera
 pos: 0 0 0
 fov: 60
