@@ -9,7 +9,7 @@ private:
 	glm::vec3* diffuse_color;
 	glm::vec3* specular_color;
 	float shininess;
-	Object3D* material_parent;
+	const Object3D* material_parent;
 public:
 	Object3D(
 		const glm::vec3& ambient_color,
@@ -17,7 +17,7 @@ public:
 		const glm::vec3& specular_color,
 		const float& shininess
 	);
-	explicit Object3D(Object3D* const& material_parent);
+	explicit Object3D(const Object3D* const& material_parent);
 	virtual ~Object3D();
 };
 

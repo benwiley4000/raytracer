@@ -15,7 +15,7 @@ Object3D::Object3D(
 	this->material_parent = nullptr;
 }
 
-Object3D::Object3D(Object3D* const& material_parent)
+Object3D::Object3D(const Object3D* const& material_parent)
 {
 	this->ambient_color = material_parent->ambient_color;
 	this->diffuse_color = material_parent->diffuse_color;
