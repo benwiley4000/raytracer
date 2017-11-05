@@ -212,6 +212,10 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 			} else if (entity_type == "model") {
 				// this is always on the line after 'model'
 				std::string obj_filename = getTrimmedLineFromFile(&scenefile, &line_number);
+				// get rid of quotation marks
+				if (obj_filename[0] == '"' && obj_filename[obj_filename.length() - 1] == '"') {
+					obj_filename = obj_filename.substr(1, obj_filename.length() - 2);
+				}
 
 				// to be read in
 				glm::vec3 ambient_color, diffuse_color, specular_color;
