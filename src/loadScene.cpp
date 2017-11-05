@@ -1,12 +1,15 @@
 #include <glm/glm.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/variant.hpp>
 
 #include <string>
 #include <vector>
 #include <fstream>
 #include <cstdio>
 #include <iostream>
+#include <algorithm>
+#include <map>
 
 #include "objects/Object3D.hpp"
 #include "objects/ObjModel.hpp"
@@ -16,6 +19,26 @@
 namespace fs = boost::filesystem;
 
 namespace scl {
+	using scene_attribute = boost::variant<glm::vec3, float>;
+
+	static std::string v1 = "v1";
+	static std::string v2 = "v2";
+	static std::string v3 = "v3";
+	static std::string amb = "amb";
+	static std::string dif = "dif";
+	static std::string spe = "spe";
+	static std::string shi = "shi";
+	static std::string fov = "fov";
+	static std::string f = "f";
+	static std::string a = "a";
+	static std::string rad = "rad";
+
+	bool isFloatAttribute(const std::string& fieldname)
+	{
+		static std::vector<std::string> names = {fov, f, a, rad, shi};
+		return std::find(names.begin(), names.end(), fieldname) != names.end();
+	}
+
 	std::string
 	getTrimmedLineFromFile(std::ifstream* const& file, int* const& line_number)
 	{
@@ -87,6 +110,52 @@ namespace scl {
 	{
 		return scenefileFieldError(fieldname, filename, line_number, "deformed");
 	}
+
+	void readSceneAttributes(
+		const std::vector<std::string>& fieldnames,
+		const std::string& filename,
+		std::map<std::string, scene_attribute>* const& scene_attributes,
+		std::ifstream* const& scenefile,
+		int* const& line_number
+	) {
+		// for holding onto data while it's being parsed
+		std::string temp;
+
+		// each will be marked true if corresponding lines are read from file
+		std::vector<bool> fields_collected(fieldnames.size(), false);
+
+		for (size_t i = 0, len = fieldnames.size(); i < len; i++) {
+			temp = getTrimmedLineFromFile(scenefile, line_number);
+			unsigned long colon_pos = temp.find(':');
+			std::string fieldname = temp.substr(0, temp.find(':'));
+			if (std::find(fieldnames.begin(), fieldnames.end(), fieldname) == fieldnames.end()) {
+				throw unknownFieldError(fieldname, filename, *line_number);
+			}
+			if (fields_collected[i]) {
+				throw duplicateFieldError(fieldname, filename, *line_number);
+			}
+			if (isFloatAttribute(fieldname)) {
+				(*scene_attributes)[fieldname] = std::stof(getTrimmedSubstring(temp, colon_pos + 1));
+			} else {
+				float x, y, z;
+				int matches = sscanf(
+					getTrimmedSubstring(temp, colon_pos + 1).c_str(),
+					"%f %f %f",
+					&x, &y, &z
+				);
+				if (matches != 3) {
+					throw deformedFieldError(fieldname, filename, *line_number);
+				}
+				(*scene_attributes)[fieldname] = glm::vec3(x, y, z);
+			}
+			fields_collected[i] = true;
+		}
+		for (size_t j = 0, len = fieldnames.size(); j < len; j++) {
+			if (!fields_collected[j]) {
+				throw missingFieldError(fieldnames[j], filename, *line_number);
+			}
+		}
+	};
 }
 
 void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene_objects)
@@ -128,89 +197,26 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 					line_number++;
 				}
 			} else if (entity_type == "triangle") {
-				// to be read in
-				glm::vec3 vertex1, vertex2, vertex3,
-					ambient_color, diffuse_color, specular_color;
-				float shininess = 0.0f;
-
-				// will be marked true if corresponding values are read from file
-				bool v1 = false, v2 = false, v3 = false,
-					amb = false, dif = false, spe = false,
-					shi = false;
-
-				for (int j = 0; j < 7; j++) {
-					temp = scl::getTrimmedLineFromFile(&scenefile, &line_number);
-					unsigned long colon_pos = temp.find(':');
-					std::string fieldname = temp.substr(0, temp.find(':'));
-					if (!(fieldname == "v1" || fieldname == "v2" || fieldname == "v3" ||
-						fieldname == "amb" || fieldname == "dif" || fieldname == "spe" ||
-						fieldname == "shi")) {
-						throw scl::unknownFieldError(fieldname, filename, line_number);
-					}
-					if ((fieldname == "v1" && v1) || (fieldname == "v2" && v2) || (fieldname == "v3" && v3) ||
-						(fieldname == "amb" && amb) || (fieldname == "dif" && dif) ||
-					    (fieldname == "spe" && spe) || (fieldname == "shi" && shi)) {
-						throw scl::duplicateFieldError(fieldname, filename, line_number);
-					}
-					if (fieldname == "shi") {
-						shi = true;
-						shininess = std::stof(scl::getTrimmedSubstring(temp, colon_pos + 1));
-					} else {
-						if (fieldname == "v1") v1 = true;
-						else if (fieldname == "v2") v2 = true;
-						else if (fieldname == "v3") v3 = true;
-						else if (fieldname == "amb") amb = true;
-						else if (fieldname == "dif") dif = true;
-						else spe = true;
-						float x, y, z;
-						int matches = sscanf(
-							scl::getTrimmedSubstring(temp, colon_pos + 1).c_str(),
-							"%f %f %f",
-							&x, &y, &z
-						);
-						if (matches != 3) {
-							throw scl::deformedFieldError(fieldname, filename, line_number);
-						}
-						glm::vec3 v(x, y, z);
-						if (fieldname == "v1") vertex1 = v;
-						else if (fieldname == "v2") vertex2 = v;
-						else if (fieldname == "v3") vertex3 = v;
-						else if (fieldname == "amb") ambient_color = v;
-						else if (fieldname == "dif") diffuse_color = v;
-						else specular_color = v;
-					}
-				}
-				if (!v1) {
-					throw scl::missingFieldError("v1", filename, line_number);
-				}
-				if (!v2) {
-					throw scl::missingFieldError("v2", filename, line_number);
-				}
-				if (!v3) {
-					throw scl::missingFieldError("v3", filename, line_number);
-				}
-				if (!amb) {
-					throw scl::missingFieldError("amb", filename, line_number);
-				}
-				if (!dif) {
-					throw scl::missingFieldError("dif", filename, line_number);
-				}
-				if (!spe) {
-					throw scl::missingFieldError("spe", filename, line_number);
-				}
-				if (!shi) {
-					throw scl::missingFieldError("shi", filename, line_number);
-				}
-
+				static std::vector<std::string> fieldnames = {
+					scl::v1, scl::v2, scl::v3, scl::amb, scl::dif, scl::spe, scl::shi
+				};
+				std::map<std::string, scl::scene_attribute> scene_attributes;
+				scl::readSceneAttributes(
+					fieldnames,
+					filename,
+					&scene_attributes,
+					&scenefile,
+					&line_number
+				);
 				scene_objects->push_back(
 					new Triangle(
-						vertex1,
-						vertex2,
-						vertex3,
-						ambient_color,
-						diffuse_color,
-						specular_color,
-						shininess
+						boost::get<glm::vec3>(scene_attributes[scl::v1]),
+						boost::get<glm::vec3>(scene_attributes[scl::v2]),
+						boost::get<glm::vec3>(scene_attributes[scl::v3]),
+						boost::get<glm::vec3>(scene_attributes[scl::amb]),
+						boost::get<glm::vec3>(scene_attributes[scl::dif]),
+						boost::get<glm::vec3>(scene_attributes[scl::spe]),
+						boost::get<float>(scene_attributes[scl::shi])
 					)
 				);
 			} else if (entity_type == "model") {
@@ -221,67 +227,24 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 					obj_filename = obj_filename.substr(1, obj_filename.length() - 2);
 				}
 
-				// to be read in
-				glm::vec3 ambient_color, diffuse_color, specular_color;
-				float shininess = 0.0f;
-
-				// will be marked true if corresponding values are read from file
-				bool amb = false, dif = false, spe = false, shi = false;
-
-				for (int j = 0; j < 4; j++) {
-					temp = scl::getTrimmedLineFromFile(&scenefile, &line_number);
-					unsigned long colon_pos = temp.find(':');
-					std::string fieldname = temp.substr(0, temp.find(':'));
-					if (!(fieldname == "amb" || fieldname == "dif" ||
-					      fieldname == "spe" || fieldname == "shi")) {
-						throw scl::unknownFieldError(fieldname, filename, line_number);
-					}
-					if ((fieldname == "amb" && amb) || (fieldname == "dif" && dif) ||
-					    (fieldname == "spe" && spe) || (fieldname == "shi" && shi)) {
-						throw scl::duplicateFieldError(fieldname, filename, line_number);
-					}
-					if (fieldname == "shi") {
-						shi = true;
-						shininess = std::stof(scl::getTrimmedSubstring(temp, colon_pos + 1));
-					} else {
-						if (fieldname == "amb") amb = true;
-						else if (fieldname == "dif") dif = true;
-						else spe = true;
-						float r, g, b;
-						int matches = sscanf(
-							scl::getTrimmedSubstring(temp, colon_pos + 1).c_str(),
-							"%f %f %f",
-							&r, &g, &b
-						);
-						if (matches != 3) {
-							throw scl::deformedFieldError(fieldname, filename, line_number);
-						}
-						glm::vec3 color(r, g, b);
-						if (fieldname == "amb") ambient_color = color;
-						else if (fieldname == "dif") diffuse_color = color;
-						else specular_color = color;
-					}
-				}
-				if (!amb) {
-					throw scl::missingFieldError("amb", filename, line_number);
-				}
-				if (!dif) {
-					throw scl::missingFieldError("dif", filename, line_number);
-				}
-				if (!spe) {
-					throw scl::missingFieldError("spe", filename, line_number);
-				}
-				if (!shi) {
-					throw scl::missingFieldError("shi", filename, line_number);
-				}
-
+				static std::vector<std::string> fieldnames = {
+					scl::amb, scl::dif, scl::spe, scl::shi
+				};
+				std::map<std::string, scl::scene_attribute> scene_attributes;
+				scl::readSceneAttributes(
+					fieldnames,
+					filename,
+					&scene_attributes,
+					&scenefile,
+					&line_number
+				);
 				scene_objects->push_back(
 					new ObjModel(
 						(models_dir / fs::path(obj_filename)).string(),
-						ambient_color,
-						diffuse_color,
-						specular_color,
-						shininess
+						boost::get<glm::vec3>(scene_attributes[scl::amb]),
+						boost::get<glm::vec3>(scene_attributes[scl::dif]),
+						boost::get<glm::vec3>(scene_attributes[scl::spe]),
+						boost::get<float>(scene_attributes[scl::shi])
 					)
 				);
 			} else {
