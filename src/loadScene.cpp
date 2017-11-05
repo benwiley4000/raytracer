@@ -163,7 +163,7 @@ namespace scl {
 				throw missingFieldError(fieldname, filename, *line_number);
 			}
 		}
-	};
+	}
 }
 
 void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene_objects)
