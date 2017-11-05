@@ -39,27 +39,28 @@ ObjModel::ObjModel(
 		throw std::runtime_error("Obj load failed.");
 	}
 
+	// populate this->vertices
+	for (size_t i = 0, len = attrib.vertices.size(); i < len; i += 3) {
+		this->vertices.emplace_back(i, i + 1, i + 2);
+	}
+
 	tinyobj::shape_t shape = shapes[0];
 
 	// Loop over faces (polygon)
 	size_t index_offset = 0;
 	for (int fv : shape.mesh.num_face_vertices) {
+		std::vector<size_t> vertex_indices;
 		// Loop over vertices in the face
 		for (size_t v = 0; v < fv; v++) {
 			// access to vertex
-			tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
-			this->vertices.emplace_back(
-				attrib.vertices[3 * idx.vertex_index + 0],
-				attrib.vertices[3 * idx.vertex_index + 1],
-				attrib.vertices[3 * idx.vertex_index + 2]
-			);
+			vertex_indices.emplace_back(shape.mesh.indices[index_offset + v].vertex_index);
 		}
 		// Tessellate face into triangles
-		for (size_t i = index_offset + 1, last = index_offset + fv - 1; i < last; i++) {
+		for (size_t i = 1, last = vertex_indices.size() - 1; i < last; i++) {
 			this->triangles.emplace_back(
-				&this->vertices[index_offset],
-				&this->vertices[i],
-				&this->vertices[i + 1],
+				&this->vertices[vertex_indices[0]],
+				&this->vertices[vertex_indices[i]],
+				&this->vertices[vertex_indices[i + 1]],
 				this
 			);
 		}
