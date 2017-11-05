@@ -11,11 +11,11 @@
 #include <algorithm>
 #include <map>
 
-#include "objects/Object3D.hpp"
-#include "objects/Sphere.hpp"
-#include "objects/Plane.hpp"
-#include "objects/Triangle.hpp"
-#include "objects/ObjModel.hpp"
+#include "entities/Object3D.hpp"
+#include "entities/Sphere.hpp"
+#include "entities/Plane.hpp"
+#include "entities/Triangle.hpp"
+#include "entities/ObjModel.hpp"
 #include "constants.hpp"
 #include "loadScene.hpp"
 

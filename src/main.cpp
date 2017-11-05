@@ -10,9 +10,9 @@
 #include <chrono>
 #include <vector>
 
-#include "objects/Object3D.hpp"
-#include "objects/Triangle.hpp"
-#include "objects/ObjModel.hpp"
+#include "entities/Object3D.hpp"
+#include "entities/Triangle.hpp"
+#include "entities/ObjModel.hpp"
 #include "loadScene.hpp"
 #include "constants.hpp"
 

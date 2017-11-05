@@ -45,16 +45,16 @@ add_executable(raytracer
     src/loadScene.hpp
     src/loadScene.cpp
     src/constants.hpp
-    src/objects/Object3D.hpp
-    src/objects/Object3D.cpp
-    src/objects/Triangle.hpp
-    src/objects/Triangle.cpp
-    src/objects/ObjModel.hpp
-    src/objects/ObjModel.cpp
-    src/objects/Plane.hpp
-    src/objects/Plane.cpp
-    src/objects/Sphere.hpp
-    src/objects/Sphere.cpp
+    src/entities/Object3D.hpp
+    src/entities/Object3D.cpp
+    src/entities/Triangle.hpp
+    src/entities/Triangle.cpp
+    src/entities/ObjModel.hpp
+    src/entities/ObjModel.cpp
+    src/entities/Plane.hpp
+    src/entities/Plane.cpp
+    src/entities/Sphere.hpp
+    src/entities/Sphere.cpp
 )
 
 # Link libraries

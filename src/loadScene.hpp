@@ -5,7 +5,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "objects/Object3D.hpp"
+#include "entities/Object3D.hpp"
 
 void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene_objects);
 
