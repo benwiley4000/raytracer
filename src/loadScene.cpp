@@ -126,8 +126,11 @@ namespace scl {
 		// for holding onto data while it's being parsed
 		std::string temp;
 
-		// each will be marked true if corresponding lines are read from file
-		std::vector<bool> fields_collected(fieldnames.size(), false);
+		// each will be marked true when corresponding lines are read from file
+		std::map<std::string, bool> fields_collected;
+		for (const std::string& fieldname : fieldnames) {
+			fields_collected[fieldname] = false;
+		}
 
 		for (size_t i = 0, len = fieldnames.size(); i < len; i++) {
 			temp = getTrimmedLineFromFile(scenefile, line_number);
@@ -136,7 +139,7 @@ namespace scl {
 			if (std::find(fieldnames.begin(), fieldnames.end(), fieldname) == fieldnames.end()) {
 				throw unknownFieldError(fieldname, filename, *line_number);
 			}
-			if (fields_collected[i]) {
+			if (fields_collected[fieldname]) {
 				throw duplicateFieldError(fieldname, filename, *line_number);
 			}
 			if (isFloatAttribute(fieldname)) {
@@ -153,11 +156,11 @@ namespace scl {
 				}
 				(*scene_attributes)[fieldname] = glm::vec3(x, y, z);
 			}
-			fields_collected[i] = true;
+			fields_collected[fieldname] = true;
 		}
-		for (size_t j = 0, len = fieldnames.size(); j < len; j++) {
-			if (!fields_collected[j]) {
-				throw missingFieldError(fieldnames[j], filename, *line_number);
+		for (const std::string& fieldname : fieldnames) {
+			if (!fields_collected[fieldname]) {
+				throw missingFieldError(fieldname, filename, *line_number);
 			}
 		}
 	};
