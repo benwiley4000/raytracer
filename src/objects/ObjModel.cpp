@@ -52,18 +52,23 @@ ObjModel::ObjModel(
 		std::vector<size_t> vertex_indices;
 		// Loop over vertices in the face
 		for (size_t v = 0; v < fv; v++) {
-			// access to vertex
 			vertex_indices.emplace_back(shape.mesh.indices[index_offset + v].vertex_index);
 		}
 		// Tessellate face into triangles
-		for (size_t i = 1, last = vertex_indices.size() - 1; i < last; i++) {
-			this->triangles.emplace_back(
-				&this->vertices[vertex_indices[0]],
-				&this->vertices[vertex_indices[i]],
-				&this->vertices[vertex_indices[i + 1]],
-				this
-			);
-		}
+		this->tessellateFace(vertex_indices);
 		index_offset += fv;
+	}
+}
+
+void ObjModel::tessellateFace(const std::vector<size_t>& vertex_indices)
+{
+	// Triangle fan tessellation (TODO: smarter tessellation)
+	for (size_t i = 1, last = vertex_indices.size() - 1; i < last; i++) {
+		this->triangles.emplace_back(
+			&this->vertices[vertex_indices[0]],
+			&this->vertices[vertex_indices[i]],
+			&this->vertices[vertex_indices[i + 1]],
+			this
+		);
 	}
 }

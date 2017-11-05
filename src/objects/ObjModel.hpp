@@ -17,6 +17,8 @@ class ObjModel : public Object3D {
 private:
 	std::vector<glm::vec3> vertices;
 	std::vector<Triangle> triangles;
+	// populate this->vertices before calling tessellateFace!
+	void tessellateFace(const std::vector<size_t>& vertex_indices);
 public:
 	explicit ObjModel(
 		const std::string& filename,
