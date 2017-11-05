@@ -42,15 +42,19 @@ find_package(Boost CONFIG REQUIRED system filesystem)
 # Add executables
 add_executable(raytracer
     src/main.cpp
+    src/loadScene.hpp
+    src/loadScene.cpp
+    src/constants.hpp
     src/objects/Object3D.hpp
     src/objects/Object3D.cpp
     src/objects/Triangle.hpp
     src/objects/Triangle.cpp
     src/objects/ObjModel.hpp
     src/objects/ObjModel.cpp
-    src/loadScene.hpp
-    src/loadScene.cpp
-    src/constants.hpp
+    src/objects/Plane.hpp
+    src/objects/Plane.cpp
+    src/objects/Sphere.hpp
+    src/objects/Sphere.cpp
 )
 
 # Link libraries

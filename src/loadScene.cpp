@@ -12,6 +12,9 @@
 #include <map>
 
 #include "objects/Object3D.hpp"
+#include "objects/Sphere.hpp"
+#include "objects/Plane.hpp"
+#include "objects/Triangle.hpp"
 #include "objects/ObjModel.hpp"
 #include "constants.hpp"
 #include "loadScene.hpp"
@@ -189,15 +192,49 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 					line_number++;
 				}
 			} else if (entity_type == "sphere") {
-				for (int j = 0; j < 6; j++) {
-					std::getline(scenefile, temp);
-					line_number++;
-				}
+				static std::vector<std::string> fieldnames = {
+					scl::pos, scl::rad, scl::amb, scl::dif, scl::spe, scl::shi
+				};
+				std::map<std::string, scl::scene_attribute> scene_attributes;
+				scl::readSceneAttributes(
+					fieldnames,
+					filename,
+					&scene_attributes,
+					&scenefile,
+					&line_number
+				);
+				scene_objects->push_back(
+					new Sphere(
+						boost::get<glm::vec3>(scene_attributes[scl::pos]),
+						boost::get<float>(scene_attributes[scl::rad]),
+						boost::get<glm::vec3>(scene_attributes[scl::amb]),
+						boost::get<glm::vec3>(scene_attributes[scl::dif]),
+						boost::get<glm::vec3>(scene_attributes[scl::spe]),
+						boost::get<float>(scene_attributes[scl::shi])
+					)
+				);
 			} else if (entity_type == "plane") {
-				for (int j = 0; j < 6; j++) {
-					std::getline(scenefile, temp);
-					line_number++;
-				}
+				static std::vector<std::string> fieldnames = {
+					scl::nor, scl::pos, scl::amb, scl::dif, scl::spe, scl::shi
+				};
+				std::map<std::string, scl::scene_attribute> scene_attributes;
+				scl::readSceneAttributes(
+					fieldnames,
+					filename,
+					&scene_attributes,
+					&scenefile,
+					&line_number
+				);
+				scene_objects->push_back(
+					new Plane(
+						boost::get<glm::vec3>(scene_attributes[scl::nor]),
+						boost::get<glm::vec3>(scene_attributes[scl::pos]),
+						boost::get<glm::vec3>(scene_attributes[scl::amb]),
+						boost::get<glm::vec3>(scene_attributes[scl::dif]),
+						boost::get<glm::vec3>(scene_attributes[scl::spe]),
+						boost::get<float>(scene_attributes[scl::shi])
+					)
+				);
 			} else if (entity_type == "triangle") {
 				static std::vector<std::string> fieldnames = {
 					scl::v1, scl::v2, scl::v3, scl::amb, scl::dif, scl::spe, scl::shi
