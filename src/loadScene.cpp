@@ -128,10 +128,91 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 					line_number++;
 				}
 			} else if (entity_type == "triangle") {
+				// to be read in
+				glm::vec3 vertex1, vertex2, vertex3,
+					ambient_color, diffuse_color, specular_color;
+				float shininess = 0.0f;
+
+				// will be marked true if corresponding values are read from file
+				bool v1 = false, v2 = false, v3 = false,
+					amb = false, dif = false, spe = false,
+					shi = false;
+
 				for (int j = 0; j < 7; j++) {
-					std::getline(scenefile, temp);
-					line_number++;
+					temp = scl::getTrimmedLineFromFile(&scenefile, &line_number);
+					unsigned long colon_pos = temp.find(':');
+					std::string fieldname = temp.substr(0, temp.find(':'));
+					if (!(fieldname == "v1" || fieldname == "v2" || fieldname == "v3" ||
+						fieldname == "amb" || fieldname == "dif" || fieldname == "spe" ||
+						fieldname == "shi")) {
+						throw scl::unknownFieldError(fieldname, filename, line_number);
+					}
+					if ((fieldname == "v1" && v1) || (fieldname == "v2" && v2) || (fieldname == "v3" && v3) ||
+						(fieldname == "amb" && amb) || (fieldname == "dif" && dif) ||
+					    (fieldname == "spe" && spe) || (fieldname == "shi" && shi)) {
+						throw scl::duplicateFieldError(fieldname, filename, line_number);
+					}
+					if (fieldname == "shi") {
+						shi = true;
+						shininess = std::stof(scl::getTrimmedSubstring(temp, colon_pos + 1));
+					} else {
+						if (fieldname == "v1") v1 = true;
+						else if (fieldname == "v2") v2 = true;
+						else if (fieldname == "v3") v3 = true;
+						else if (fieldname == "amb") amb = true;
+						else if (fieldname == "dif") dif = true;
+						else spe = true;
+						float x, y, z;
+						int matches = sscanf(
+							scl::getTrimmedSubstring(temp, colon_pos + 1).c_str(),
+							"%f %f %f",
+							&x, &y, &z
+						);
+						if (matches != 3) {
+							throw scl::deformedFieldError(fieldname, filename, line_number);
+						}
+						glm::vec3 v(x, y, z);
+						if (fieldname == "v1") vertex1 = v;
+						else if (fieldname == "v2") vertex2 = v;
+						else if (fieldname == "v3") vertex3 = v;
+						else if (fieldname == "amb") ambient_color = v;
+						else if (fieldname == "dif") diffuse_color = v;
+						else specular_color = v;
+					}
 				}
+				if (!v1) {
+					throw scl::missingFieldError("v1", filename, line_number);
+				}
+				if (!v2) {
+					throw scl::missingFieldError("v2", filename, line_number);
+				}
+				if (!v3) {
+					throw scl::missingFieldError("v3", filename, line_number);
+				}
+				if (!amb) {
+					throw scl::missingFieldError("amb", filename, line_number);
+				}
+				if (!dif) {
+					throw scl::missingFieldError("dif", filename, line_number);
+				}
+				if (!spe) {
+					throw scl::missingFieldError("spe", filename, line_number);
+				}
+				if (!shi) {
+					throw scl::missingFieldError("shi", filename, line_number);
+				}
+
+				scene_objects->push_back(
+					new Triangle(
+						vertex1,
+						vertex2,
+						vertex3,
+						ambient_color,
+						diffuse_color,
+						specular_color,
+						shininess
+					)
+				);
 			} else if (entity_type == "model") {
 				// this is always on the line after 'model'
 				std::string obj_filename = scl::getTrimmedLineFromFile(&scenefile, &line_number);

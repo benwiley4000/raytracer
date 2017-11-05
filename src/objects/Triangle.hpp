@@ -7,26 +7,26 @@
 
 class Triangle : public Object3D  {
 private:
-	glm::vec3* v0;
-	glm::vec3* v1;
-	glm::vec3* v2;
+	glm::vec3* vertex1;
+	glm::vec3* vertex2;
+	glm::vec3* vertex3;
 	glm::vec3 normal;
 	bool using_external_vertices;
 	void setNormal();
 public:
 	Triangle(
-		const glm::vec3& v0,
-		const glm::vec3& v1,
-		const glm::vec3& v2,
+		const glm::vec3& vertex1,
+		const glm::vec3& vertex2,
+		const glm::vec3& vertex3,
 		const glm::vec3& ambient_color,
 		const glm::vec3& diffuse_color,
 		const glm::vec3& specular_color,
 		const float& shininess
 	);
 	Triangle(
-		glm::vec3* v0,
-		glm::vec3* v1,
-		glm::vec3* v2,
+		glm::vec3* vertex1,
+		glm::vec3* vertex2,
+		glm::vec3* vertex3,
 		Object3D* const& material_parent
 	);
 	~Triangle() override;
