@@ -48,6 +48,9 @@ add_executable(raytracer
     src/objects/Triangle.cpp
     src/objects/ObjModel.hpp
     src/objects/ObjModel.cpp
+    src/loadScene.hpp
+    src/loadScene.cpp
+    src/constants.hpp
 )
 
 # Link libraries
