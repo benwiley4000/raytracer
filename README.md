@@ -24,7 +24,7 @@ Beyond the C++ standard library this application relies on:
 * GLM
 * STB (particularly the stb_image_write.h header library)
 * tinyobjloader
-* Boost's filesystem library
+* Boost
 
 (Following standard setup procedure in a CMake-compatible IDE should fetch all these dependencies for you, so you shouldn't need to download them separately.)
 
