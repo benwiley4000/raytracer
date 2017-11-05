@@ -45,6 +45,10 @@ add_executable(raytracer
     src/loadScene.hpp
     src/loadScene.cpp
     src/constants.hpp
+    src/entities/Camera.hpp
+    src/entities/Camera.cpp
+    src/entities/Light.hpp
+    src/entities/Light.cpp
     src/entities/Object3D.hpp
     src/entities/Object3D.cpp
     src/entities/Triangle.hpp

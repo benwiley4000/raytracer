@@ -46,7 +46,7 @@ Each entity entry's first line is a keyword specifying its type, followed by att
 The camera description specifies how the scene will be viewed. It is a special case - only the first camera specified will be read. Others will be ignored.
 
 * `pos` (*type*: `point3`): The 3D position of the camera in the scene
-* `fov` (*type*: `float`): The camera's field-of-view angle (in degrees)
+* `fov` (*type*: `float`): The camera's field-of-view (y) angle (in degrees)
 * `f`: (*type*: `float`): The local length of the camera (distance between camera and image plane)
 * `a`: (*type*: `float`): The aspect ratio of the camera (width divided by height)
 

@@ -10,9 +10,9 @@
 #include <chrono>
 #include <vector>
 
+#include "entities/Camera.hpp"
+#include "entities/Light.hpp"
 #include "entities/Object3D.hpp"
-#include "entities/Triangle.hpp"
-#include "entities/ObjModel.hpp"
 #include "loadScene.hpp"
 #include "constants.hpp"
 
@@ -30,13 +30,15 @@ void waitForInput();
 std::thread t;
 std::mutex mut;
 
+Camera camera;
+std::vector<Light> lights;
 std::vector<Object3D*> scene_objects;
 
 bool done = false;
 
 int main()
 {
-	loadScene(getSceneFilename(), &scene_objects);
+	loadScene(getSceneFilename(), &camera, &lights, &scene_objects);
 
 	// Print blank line before beginning ray tracing
 	std::cout << std::endl;

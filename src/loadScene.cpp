@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <map>
 
+#include "entities/Camera.hpp"
+#include "entities/Light.hpp"
 #include "entities/Object3D.hpp"
 #include "entities/Sphere.hpp"
 #include "entities/Plane.hpp"
@@ -37,6 +39,7 @@ namespace scl {
 	static std::string rad = "rad";
 	static std::string pos = "pos";
 	static std::string nor = "nor";
+	static std::string col = "col";
 
 	bool isFloatAttribute(const std::string& fieldname)
 	{
@@ -166,8 +169,12 @@ namespace scl {
 	}
 }
 
-void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene_objects)
-{
+void loadScene(
+	const std::string& filename,
+	Camera* const& camera,
+	std::vector<Light>* const& lights,
+	std::vector<Object3D*>* const& scene_objects
+) {
 	try {
 		int line_number = 0;
 
@@ -177,6 +184,7 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 		int entity_count = std::stoi(first_line);
 
 		// read in the number of entities specified at the top of the file
+		bool camera_read = false;
 		for (int i = entity_count; i--; ) {
 			std::string entity_type = scl::getTrimmedLineFromFile(&scenefile, &line_number);
 
@@ -185,15 +193,40 @@ void loadScene(const std::string& filename, std::vector<Object3D*>* const& scene
 
 			// different behavior depending on entity type
 			if (entity_type == "camera") {
-				for (int j = 0; j < 4; j++) {
-					std::getline(scenefile, temp);
-					line_number++;
+				static std::vector<std::string> fieldnames = {
+					scl::pos, scl::fov, scl::f, scl::a
+				};
+				if (!camera_read) {
+					std::map<std::string, scl::scene_attribute> scene_attributes;
+					scl::readSceneAttributes(
+						fieldnames,
+						filename,
+						&scene_attributes,
+						&scenefile,
+						&line_number
+					);
+					*camera = Camera(
+						boost::get<glm::vec3>(scene_attributes[scl::pos]),
+						boost::get<float>(scene_attributes[scl::fov]),
+						boost::get<float>(scene_attributes[scl::f]),
+						boost::get<float>(scene_attributes[scl::a])
+					);
+					camera_read = true;
 				}
 			} else if (entity_type == "light") {
-				for (int j = 0; j < 2; j++) {
-					std::getline(scenefile, temp);
-					line_number++;
-				}
+				static std::vector<std::string> fieldnames = {scl::pos, scl::col};
+				std::map<std::string, scl::scene_attribute> scene_attributes;
+				scl::readSceneAttributes(
+					fieldnames,
+					filename,
+					&scene_attributes,
+					&scenefile,
+					&line_number
+				);
+				lights->emplace_back(
+					boost::get<glm::vec3>(scene_attributes[scl::pos]),
+					boost::get<glm::vec3>(scene_attributes[scl::col])
+				);
 			} else if (entity_type == "sphere") {
 				static std::vector<std::string> fieldnames = {
 					scl::pos, scl::rad, scl::amb, scl::dif, scl::spe, scl::shi
