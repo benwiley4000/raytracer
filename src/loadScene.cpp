@@ -135,15 +135,15 @@ namespace scl {
 		for (size_t i = 0, len = fieldnames.size(); i < len; i++) {
 			temp = getTrimmedLineFromFile(scenefile, line_number);
 			unsigned long colon_pos = temp.find(':');
-			std::string fieldname = temp.substr(0, temp.find(':'));
-			if (std::find(fieldnames.begin(), fieldnames.end(), fieldname) == fieldnames.end()) {
-				throw unknownFieldError(fieldname, filename, *line_number);
+			std::string prefix = temp.substr(0, temp.find(':'));
+			if (std::find(fieldnames.begin(), fieldnames.end(), prefix) == fieldnames.end()) {
+				throw unknownFieldError(prefix, filename, *line_number);
 			}
-			if (fields_collected[fieldname]) {
-				throw duplicateFieldError(fieldname, filename, *line_number);
+			if (fields_collected[prefix]) {
+				throw duplicateFieldError(prefix, filename, *line_number);
 			}
-			if (isFloatAttribute(fieldname)) {
-				(*scene_attributes)[fieldname] = std::stof(getTrimmedSubstring(temp, colon_pos + 1));
+			if (isFloatAttribute(prefix)) {
+				(*scene_attributes)[prefix] = std::stof(getTrimmedSubstring(temp, colon_pos + 1));
 			} else {
 				float x, y, z;
 				int matches = sscanf(
@@ -152,11 +152,11 @@ namespace scl {
 					&x, &y, &z
 				);
 				if (matches != 3) {
-					throw deformedFieldError(fieldname, filename, *line_number);
+					throw deformedFieldError(prefix, filename, *line_number);
 				}
-				(*scene_attributes)[fieldname] = glm::vec3(x, y, z);
+				(*scene_attributes)[prefix] = glm::vec3(x, y, z);
 			}
-			fields_collected[fieldname] = true;
+			fields_collected[prefix] = true;
 		}
 		for (const std::string& fieldname : fieldnames) {
 			if (!fields_collected[fieldname]) {
