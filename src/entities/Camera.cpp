@@ -1,4 +1,6 @@
 #include <glm/glm.hpp>
+#include <vector>
+#include <cmath>
 
 #include "Camera.hpp"
 
@@ -10,4 +12,41 @@ Camera::Camera(
 ) : position(position),
     fov_y(fov_y),
     focal_length(focal_length),
-    aspect_ratio(aspect_ratio) {}
+    aspect_ratio(aspect_ratio)
+{
+	// negative-Z axis unit vector
+	static glm::vec3 forward(0.0f, 0.0f, -1.0f);
+
+	double height = 2 * focal_length * tan((double)fov_y / 2.0);
+	double width = aspect_ratio * height;
+
+	this->pixel_height = (int)round(height);
+	this->pixel_width = (int)round(width);
+
+	glm::vec3 image_center = position + forward * focal_length;
+	// bottom_left is a CENTER of bottom left pixel, not at its bottom left corner.
+	glm::vec3 bottom_left = image_center -
+		glm::vec3(this->pixel_width / 2.0f + 0.5f, this->pixel_height / 2.0f + 0.5f, 0.0f);
+
+	for (int row = 0; row < this->pixel_height; row++) {
+		for (int col = 0; col < this->pixel_width; col++) {
+			this->rays.push_back(
+				// unit vector pointing in direction from camera position to pixel
+				glm::normalize(
+					glm::vec3(bottom_left.x + col, bottom_left.y + row, bottom_left.z) -
+						this->position
+				)
+			);
+		}
+	}
+}
+
+const std::vector<glm::vec3>& Camera::getRays(
+	int* const& pixel_width,
+	int* const& pixel_height
+) const
+{
+	(*pixel_width) = this->pixel_width;
+	(*pixel_height) = this->pixel_height;
+	return this->rays;
+}
