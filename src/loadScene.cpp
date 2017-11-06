@@ -207,7 +207,7 @@ void loadScene(
 					);
 					*camera = Camera(
 						boost::get<glm::vec3>(scene_attributes[scl::pos]),
-						boost::get<float>(glm::radians(scene_attributes[scl::fov])),
+						glm::radians(boost::get<float>(scene_attributes[scl::fov])),
 						boost::get<float>(scene_attributes[scl::f]),
 						boost::get<float>(scene_attributes[scl::a])
 					);
