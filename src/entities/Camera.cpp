@@ -1,3 +1,5 @@
+#include <glm/glm.hpp>
+
 #include "Camera.hpp"
 
 Camera::Camera(
