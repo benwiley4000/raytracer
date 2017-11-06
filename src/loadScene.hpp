@@ -7,7 +7,7 @@
 
 #include "entities/Camera.hpp"
 #include "entities/Light.hpp"
-#include "entities/Object3D.hpp"
+#include "entities/objects/Object3D.hpp"
 
 void loadScene(
 	const std::string& filename,

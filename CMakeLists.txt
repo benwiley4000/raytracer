@@ -49,16 +49,16 @@ add_executable(raytracer
     src/entities/Camera.cpp
     src/entities/Light.hpp
     src/entities/Light.cpp
-    src/entities/Object3D.hpp
-    src/entities/Object3D.cpp
-    src/entities/Triangle.hpp
-    src/entities/Triangle.cpp
-    src/entities/ObjModel.hpp
-    src/entities/ObjModel.cpp
-    src/entities/Plane.hpp
-    src/entities/Plane.cpp
-    src/entities/Sphere.hpp
-    src/entities/Sphere.cpp
+    src/entities/objects/Object3D.hpp
+    src/entities/objects/Object3D.cpp
+    src/entities/objects/Triangle.hpp
+    src/entities/objects/Triangle.cpp
+    src/entities/objects/ObjModel.hpp
+    src/entities/objects/ObjModel.cpp
+    src/entities/objects/Plane.hpp
+    src/entities/objects/Plane.cpp
+    src/entities/objects/Sphere.hpp
+    src/entities/objects/Sphere.cpp
 )
 
 # Link libraries

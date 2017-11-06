@@ -12,7 +12,7 @@
 
 #include "entities/Camera.hpp"
 #include "entities/Light.hpp"
-#include "entities/Object3D.hpp"
+#include "entities/objects/Object3D.hpp"
 #include "loadScene.hpp"
 #include "constants.hpp"
 

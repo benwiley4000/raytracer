@@ -3,7 +3,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "../vendor/tiny_obj_loader.cc"
+#include <src/vendor/tiny_obj_loader.cc>
 
 #include "Object3D.hpp"
 #include "ObjModel.hpp"

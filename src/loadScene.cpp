@@ -13,11 +13,11 @@
 
 #include "entities/Camera.hpp"
 #include "entities/Light.hpp"
-#include "entities/Object3D.hpp"
-#include "entities/Sphere.hpp"
-#include "entities/Plane.hpp"
-#include "entities/Triangle.hpp"
-#include "entities/ObjModel.hpp"
+#include "entities/objects/Object3D.hpp"
+#include "entities/objects/Sphere.hpp"
+#include "entities/objects/Plane.hpp"
+#include "entities/objects/Triangle.hpp"
+#include "entities/objects/ObjModel.hpp"
 #include "constants.hpp"
 #include "loadScene.hpp"
 
