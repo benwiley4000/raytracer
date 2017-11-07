@@ -2,6 +2,8 @@
 #include <cmath>
 #include <algorithm>
 
+#include <src/constants.hpp>
+
 #include "Object3D.hpp"
 #include "Sphere.hpp"
 
@@ -40,5 +42,5 @@ bool Sphere::doesRayIntersect(
 
 	*normal = (1 / this->radius) * (origin + direction * *t) - this->position;
 
-	return *t > 0;
+	return *t >= t_threshold;
 }

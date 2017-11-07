@@ -1,8 +1,9 @@
 #include <glm/glm.hpp>
 
+#include <src/constants.hpp>
+
 #include "Object3D.hpp"
 #include "Triangle.hpp"
-#include "Plane.hpp"
 
 Triangle::Triangle(
 	const glm::vec3& vertex1,
@@ -67,7 +68,7 @@ bool Triangle::doesRayIntersect(
 	                           this->normal.z * direction.z;
 
 	*t = -(normal_dot_origin + normal_dot_position) / normal_dot_direction;
-	if (*t <= 0) {
+	if (*t < t_threshold) {
 		return false;
 	}
 

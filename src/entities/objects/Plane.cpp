@@ -1,5 +1,7 @@
 #include <glm/glm.hpp>
 
+#include <src/constants.hpp>
+
 #include "Object3D.hpp"
 #include "Plane.hpp"
 
@@ -39,5 +41,5 @@ bool Plane::doesRayIntersect(
 		this->normal.z * direction.z;
 
 	*t = -(normal_dot_origin + normal_dot_position) / normal_dot_direction;
-	return *t > 0;
+	return *t >= t_threshold;
 }
