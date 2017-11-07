@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+// abstract class
+
 class Object3D {
 private:
 	glm::vec3* ambient_color;
@@ -19,6 +21,15 @@ public:
 	);
 	explicit Object3D(const Object3D* const& material_parent);
 	virtual ~Object3D();
+	bool isBlockingSegment(const glm::vec3& point_a, const glm::vec3& point_b) const;
+	// if return is true, *t is set to value of t in
+	// ray parametric equation: p(t) = origin + direction * t
+	virtual bool doesRayIntersect(
+		const glm::vec3& origin,
+		const glm::vec3& direction,
+		float* const& t,
+		glm::vec3* const& normal
+	) const = 0;
 };
 
 

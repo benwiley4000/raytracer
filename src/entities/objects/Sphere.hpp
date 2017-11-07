@@ -18,6 +18,12 @@ public:
 		const glm::vec3& specular_color,
 		const float& shininess
 	);
+	bool doesRayIntersect(
+		const glm::vec3& origin,
+		const glm::vec3& direction,
+		float* const& t,
+		glm::vec3* const& normal
+	) const override;
 };
 
 

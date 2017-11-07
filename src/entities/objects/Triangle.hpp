@@ -30,6 +30,12 @@ public:
 		Object3D* const& material_parent
 	);
 	~Triangle() override;
+	bool doesRayIntersect(
+		const glm::vec3& origin,
+		const glm::vec3& direction,
+		float* const& t,
+		glm::vec3* const& normal
+	) const override;
 };
 
 

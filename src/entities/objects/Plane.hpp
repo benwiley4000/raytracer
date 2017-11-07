@@ -4,8 +4,10 @@
 #include <glm/glm.hpp>
 
 #include "Object3D.hpp"
+#include "Triangle.hpp"
 
 class Plane : public Object3D  {
+	friend Triangle;
 private:
 	glm::vec3 normal;
 	glm::vec3 position;
@@ -18,6 +20,12 @@ public:
 		const glm::vec3& specular_color,
 		const float& shininess
 	);
+	bool doesRayIntersect(
+		const glm::vec3& origin,
+		const glm::vec3& direction,
+		float* const& t,
+		glm::vec3* const& normal
+	) const override;
 };
 
 

@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <limits>
 
 #include <src/vendor/tiny_obj_loader.cc>
 
@@ -58,6 +59,31 @@ ObjModel::ObjModel(
 		this->tessellateFace(vertex_indices);
 		index_offset += fv;
 	}
+}
+
+bool ObjModel::doesRayIntersect(
+	const glm::vec3& origin,
+	const glm::vec3& direction,
+	float* const& t,
+	glm::vec3* const& normal
+) const
+{
+	*t = std::numeric_limits<float>::max();
+
+	bool does_intersect = false;
+
+	float temp_t;
+	glm::vec3 temp_normal;
+	// find nearest intersection point among triangles forming tessellation
+	for (const Triangle& tri : this->triangles) {
+		if (tri.doesRayIntersect(origin, direction, &temp_t, &temp_normal) && temp_t < *t) {
+			*t = temp_t;
+			*normal = temp_normal;
+			does_intersect = true;
+		}
+	}
+
+	return does_intersect;
 }
 
 void ObjModel::tessellateFace(const std::vector<size_t>& vertex_indices)

@@ -32,3 +32,12 @@ Object3D::~Object3D()
 		delete this->specular_color;
 	}
 }
+
+bool Object3D::isBlockingSegment(const glm::vec3& point_a, const glm::vec3& point_b) const
+{
+	glm::vec3 segment = point_b - point_a;
+	glm::vec3 direction = glm::normalize(segment);
+	float t;
+	glm::vec3 normal; // doesn't get used here
+	return this->doesRayIntersect(point_a, direction, &t, &normal) && t < segment.length();
+}
