@@ -44,6 +44,8 @@ add_executable(raytracer
     src/main.cpp
     src/loadScene.hpp
     src/loadScene.cpp
+    src/getColorForRay.hpp
+    src/getColorForRay.cpp
     src/constants.hpp
     src/entities/Camera.hpp
     src/entities/Camera.cpp

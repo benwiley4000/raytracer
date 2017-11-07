@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <iostream>
 #include <cstdio>
@@ -10,10 +11,14 @@
 #include <chrono>
 #include <vector>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "vendor/stb_image_write.h"
+
 #include "entities/Camera.hpp"
 #include "entities/Light.hpp"
 #include "entities/objects/Object3D.hpp"
 #include "loadScene.hpp"
+#include "getColorForRay.hpp"
 #include "constants.hpp"
 
 namespace fs = boost::filesystem;
@@ -21,11 +26,14 @@ namespace fs = boost::filesystem;
 // run in main thread
 std::string getSceneFilename();
 
-// run in separate thread
+// run in separate ray tracing thread
 void raytraceScene();
 
 // run in main thread
 void waitForInput();
+
+// run in main thread
+void saveImage();
 
 std::thread t;
 std::mutex mut;
@@ -34,7 +42,14 @@ Camera camera;
 std::vector<Light> lights;
 std::vector<Object3D*> scene_objects;
 
+const int image_channels = 3;
+
+std::vector<float> image;
+unsigned long image_width;
+unsigned long image_height;
+
 bool done = false;
+bool force_quit = false;
 
 int main()
 {
@@ -51,12 +66,24 @@ int main()
 	std::string trash; // input that won't get used
 	while (!done) {
 		std::getline(std::cin, trash); // wait for user to hit enter
-		waitForInput();
+		if (!done) {
+			waitForInput();
+		} // else: ray tracing thread finished while we were waiting!
+	}
+
+	if (!force_quit) {
+		// prompt user to save final image
+		saveImage();
 	}
 
 	// deallocate our objects
 	for (Object3D* object : scene_objects) {
 		delete object;
+	}
+
+	if (t.joinable()) {
+		// wait for raytraceScene thread to finish if it's still not closed
+		t.join();
 	}
 
 	return 0;
@@ -106,24 +133,57 @@ void raytraceScene()
 	std::chrono::microseconds wait_duration(100);
 
 	mut.lock();
-	while (!done) {
-		std::cout << "Ray tracing scene... (enter any input to pause)" << std::endl;
-		std::this_thread::sleep_for(trace_duration);
+	glm::vec3 center_of_projection = camera.getPosition();
+	const std::vector<glm::vec3>& ray_unit_vectors = camera.getRays(
+		&image_width,
+		&image_height
+	);
+	image.assign(ray_unit_vectors.size() * image_channels, 0.0f);
+	std::cout << "Ray tracing scene... (enter any input to pause)" << std::endl;
+	for (size_t i = 0; !done && i < ray_unit_vectors.size(); i++) {
+		glm::vec3 color = getColorForRay(
+			center_of_projection,
+			ray_unit_vectors[i],
+			lights,
+			scene_objects
+		);
+		image[i * image_channels] = color.r;
+		image[i * image_channels + 1] = color.g;
+		image[i * image_channels + 2] = color.b;
+
+		// indicate progress
+		if (i % 1000 == 0) {
+			for (size_t j = 0, len = i / 1000; j < len; j++) {
+				std::cout << ". ";
+			}
+			std::cout << std::endl;
+		}
+
 		mut.unlock(); // possibly defer to waitForInput
 		// sleep for extremely small duration to give main thread time to register inputs
 		std::this_thread::sleep_for(wait_duration);
 		mut.lock(); // pick up when waitForInput has given back control
 	}
+
+	done = true;
+	// Main thread will take care of save after enter
+	std::cout << "Ray tracing complete." << std::endl;
+	if (!force_quit) {
+		std::cout << " Press enter to save final image.";
+	}
+	std::cout << std::endl;
 }
 
 void waitForInput()
 {
 	std::cout << "Pausing ray trace..." << std::endl;
 	mut.lock();
-	std::cout << "Enter 'q' to quit or anything else to continue." << std::endl;
+	std::cout << "Enter 's' to save an image snapshot, 'q' to quit, ";
+	std::cout << "or anything else to continue." << std::endl;
 	auto c = (char)getchar();
 	if (c == 'q' || c == 'Q') {
 		done = true;
+		force_quit = true;
 		mut.unlock();
 		if (t.joinable()) {
 			// wait for raytraceScene thread to finish
@@ -131,6 +191,33 @@ void waitForInput()
 		}
 		return;
 	}
-	std::cout << "Resuming ray trace..." << std::endl;
+	if (c == 's' || c == 'S') {
+		// save partial image to file
+		saveImage();
+	}
+	std::cout << "Resuming ray trace... (enter any input to pause)" << std::endl;
 	mut.unlock(); // return control to raytraceScene
+}
+
+void saveImage()
+{
+	std::cout << "Enter filename to save image: ";
+	std::string filename;
+	std::cin.clear(); // clear inputs that could be read immediately
+	std::cin.ignore();
+	std::getline(std::cin, filename);
+	boost::trim(filename);
+	if (!boost::algorithm::ends_with(boost::algorithm::to_lower_copy(filename), ".bmp")) {
+		filename += ".bmp";
+	}
+
+	stbi_write_bmp(
+		(renders_dir / fs::path(filename)).c_str(),
+		(int)image_width,
+		(int)image_height,
+		image_channels,
+		image.data()
+	);
+
+	std::cout << "Image saved to " << filename << "." << std::endl;
 }

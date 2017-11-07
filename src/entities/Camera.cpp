@@ -20,8 +20,8 @@ Camera::Camera(
 	double height = 2 * focal_length * tan((double)fov_y / 2.0);
 	double width = aspect_ratio * height;
 
-	this->pixel_height = (int)round(height);
-	this->pixel_width = (int)round(width);
+	this->pixel_height = (unsigned long)round(height);
+	this->pixel_width = (unsigned long)round(width);
 
 	glm::vec3 image_center = position + forward * focal_length;
 	// bottom_left is a CENTER of bottom left pixel, not at its bottom left corner.
@@ -41,9 +41,14 @@ Camera::Camera(
 	}
 }
 
+glm::vec3 Camera::getPosition() const
+{
+	return this->position;
+}
+
 const std::vector<glm::vec3>& Camera::getRays(
-	int* const& pixel_width,
-	int* const& pixel_height
+	unsigned long* const& pixel_width,
+	unsigned long* const& pixel_height
 ) const
 {
 	(*pixel_width) = this->pixel_width;

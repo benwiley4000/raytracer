@@ -12,6 +12,10 @@ TBA
 
 See [Scene description format](docs/scenes.md).
 
+## Viewing saved output
+
+Saved renders are placed in the [renders directory](renders/).
+
 ## Building
 
 See [Building and running the project](docs/building.md).
