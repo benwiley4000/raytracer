@@ -127,6 +127,18 @@ std::string getSceneFilename()
 	return filenames[option];
 }
 
+size_t printProgress(const size_t& iterations, const size_t& total)
+{
+	static size_t last_progress = 0;
+	size_t progress = iterations * 100 / total;
+	if (progress > last_progress) {
+		std::cout << progress << "%" << std::endl;
+		last_progress = progress;
+	} else if (iterations % 1000 == 0) {
+		std::cout << ". ";
+	}
+}
+
 void raytraceScene()
 {
 	std::chrono::seconds trace_duration(1);
@@ -152,12 +164,7 @@ void raytraceScene()
 		image[i * image_channels + 2] = (char)(255 * color.b);
 
 		// indicate progress
-		if (i % 15000 == 0) {
-			for (size_t j = 0, len = i / 15000; j < len; j++) {
-				std::cout << ". ";
-			}
-			std::cout << i * 100 / ray_unit_vectors.size() << "%" << std::endl;
-		}
+		printProgress(i, ray_unit_vectors.size());
 
 		mut.unlock(); // possibly defer to waitForInput
 		// sleep for extremely small duration to give main thread time to register inputs
