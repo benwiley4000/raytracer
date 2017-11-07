@@ -44,7 +44,7 @@ std::vector<Object3D*> scene_objects;
 
 const int image_channels = 3;
 
-std::vector<float> image;
+std::vector<char> image;
 unsigned long image_width;
 unsigned long image_height;
 
@@ -138,7 +138,7 @@ void raytraceScene()
 		&image_width,
 		&image_height
 	);
-	image.assign(ray_unit_vectors.size() * image_channels, 0.0f);
+	image.assign(ray_unit_vectors.size() * image_channels, 0);
 	std::cout << "Ray tracing scene... (enter any input to pause)" << std::endl;
 	for (size_t i = 0; !done && i < ray_unit_vectors.size(); i++) {
 		glm::vec3 color = getColorForRay(
@@ -147,16 +147,16 @@ void raytraceScene()
 			lights,
 			scene_objects
 		);
-		image[i * image_channels] = color.r;
-		image[i * image_channels + 1] = color.g;
-		image[i * image_channels + 2] = color.b;
+		image[i * image_channels] = (char)(255 * color.r);
+		image[i * image_channels + 1] = (char)(255 * color.g);
+		image[i * image_channels + 2] = (char)(255 * color.b);
 
 		// indicate progress
-		if (i % 1000 == 0) {
-			for (size_t j = 0, len = i / 1000; j < len; j++) {
+		if (i % 15000 == 0) {
+			for (size_t j = 0, len = i / 15000; j < len; j++) {
 				std::cout << ". ";
 			}
-			std::cout << std::endl;
+			std::cout << i * 100 / ray_unit_vectors.size() << "%" << std::endl;
 		}
 
 		mut.unlock(); // possibly defer to waitForInput

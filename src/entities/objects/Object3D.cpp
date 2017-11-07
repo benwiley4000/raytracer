@@ -33,6 +33,26 @@ Object3D::~Object3D()
 	}
 }
 
+glm::vec3 Object3D::getAmbientColor() const
+{
+	return *this->ambient_color;
+}
+
+glm::vec3 Object3D::getDiffuseColor() const
+{
+	return *this->diffuse_color;
+}
+
+glm::vec3 Object3D::getSpecularColor() const
+{
+	return *this->specular_color;
+}
+
+float Object3D::getShininess() const
+{
+	return this->shininess;
+}
+
 bool Object3D::isBlockingSegment(const glm::vec3& point_a, const glm::vec3& point_b) const
 {
 	glm::vec3 segment = point_b - point_a;

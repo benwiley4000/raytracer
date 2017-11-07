@@ -21,6 +21,10 @@ public:
 	);
 	explicit Object3D(const Object3D* const& material_parent);
 	virtual ~Object3D();
+	glm::vec3 getAmbientColor() const;
+	glm::vec3 getDiffuseColor() const;
+	glm::vec3 getSpecularColor() const;
+	float getShininess() const;
 	bool isBlockingSegment(const glm::vec3& point_a, const glm::vec3& point_b) const;
 	// if return is true, *t is set to value of t in
 	// ray parametric equation: p(t) = origin + direction * t
