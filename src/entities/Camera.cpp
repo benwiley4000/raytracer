@@ -1,6 +1,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
+#include <algorithm>
 
 #include "Camera.hpp"
 
@@ -30,14 +32,22 @@ Camera::Camera(
 
 	for (int row = 0; row < this->pixel_height; row++) {
 		for (int col = 0; col < this->pixel_width; col++) {
-			this->rays.push_back(
+			this->rays.emplace_back(
 				// unit vector pointing in direction from camera position to pixel
 				glm::normalize(
 					glm::vec3(bottom_left.x + col, bottom_left.y + row, bottom_left.z) -
 						this->position
-				)
+				),
+				// position in image
+				row * this->pixel_width + col
 			);
 		}
+	}
+
+	// Fisher-Yates Shuffle (so whole image appears gradually)
+	for (size_t i = this->rays.size(); i--; ) {
+		size_t j = rand() % (i + 1);
+		std::iter_swap(this->rays.begin() + i, this->rays.begin() + j);
 	}
 }
 
@@ -46,7 +56,7 @@ glm::vec3 Camera::getPosition() const
 	return this->position;
 }
 
-const std::vector<glm::vec3>& Camera::getRays(
+const std::vector<std::pair<glm::vec3, int>>& Camera::getRays(
 	unsigned long* const& pixel_width,
 	unsigned long* const& pixel_height
 ) const

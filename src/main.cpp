@@ -10,6 +10,7 @@
 #include <mutex>
 #include <chrono>
 #include <vector>
+#include <utility>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "vendor/stb_image_write.h"
@@ -146,25 +147,27 @@ void raytraceScene()
 
 	mut.lock();
 	glm::vec3 center_of_projection = camera.getPosition();
-	const std::vector<glm::vec3>& ray_unit_vectors = camera.getRays(
+	const std::vector<std::pair<glm::vec3, int>>& rays = camera.getRays(
 		&image_width,
 		&image_height
 	);
-	image.assign(ray_unit_vectors.size() * image_channels, 0);
+	image.assign(rays.size() * image_channels, 0);
 	std::cout << "Ray tracing scene... (enter any input to pause)" << std::endl;
-	for (size_t i = 0; !done && i < ray_unit_vectors.size(); i++) {
+	for (size_t i = 0; !done && i < rays.size(); i++) {
+		glm::vec3 direction = rays[i].first;
 		glm::vec3 color = getColorForRay(
 			center_of_projection,
-			ray_unit_vectors[i],
+			direction,
 			lights,
 			scene_objects
 		);
-		image[i * image_channels] = (char)(255 * color.r);
-		image[i * image_channels + 1] = (char)(255 * color.g);
-		image[i * image_channels + 2] = (char)(255 * color.b);
+		int index = rays[i].second;
+		image[index * image_channels] = (char)(255 * color.r);
+		image[index * image_channels + 1] = (char)(255 * color.g);
+		image[index * image_channels + 2] = (char)(255 * color.b);
 
 		// indicate progress
-		printProgress(i, ray_unit_vectors.size());
+		printProgress(i, rays.size());
 
 		mut.unlock(); // possibly defer to waitForInput
 		// sleep for extremely small duration to give main thread time to register inputs
