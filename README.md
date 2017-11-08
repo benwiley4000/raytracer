@@ -29,9 +29,12 @@ Beyond the C++ standard library this application relies on:
 * STB (particularly the stb_image_write.h header library)
 * tinyobjloader
 * Boost
+* SDL2 (for displaying the current state of the ray trace)
 
 (Following standard setup procedure in a CMake-compatible IDE should fetch all these dependencies for you, so you shouldn't need to download them separately.)
 
 ### Other help
 
 * Cross platform CMake setup created using [Hunter](https://github.com/ruslo/hunter)
+* Thanks to this [StackOverflow answer](https://stackoverflow.com/a/35989490/4956731) for helping me display my render with SDL
+* Thanks to COMP 371 at Concordia for all the materials helping with various formulas for ray tracing

@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <SDL2/SDL.h>
 
 #include <iostream>
 #include <cstdio>
@@ -46,8 +47,8 @@ std::vector<Object3D*> scene_objects;
 const int image_channels = 3;
 
 std::vector<char> image;
-unsigned long image_width;
-unsigned long image_height;
+unsigned int image_width;
+unsigned int image_height;
 
 bool done = false;
 bool force_quit = false;
@@ -140,18 +141,40 @@ size_t printProgress(const size_t& iterations, const size_t& total)
 	}
 }
 
+void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
+{
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
+
 void raytraceScene()
 {
 	std::chrono::seconds trace_duration(1);
 	std::chrono::microseconds wait_duration(100);
 
 	mut.lock();
+
 	glm::vec3 center_of_projection = camera.getPosition();
 	const std::vector<std::pair<glm::vec3, int>>& rays = camera.getRays(
 		&image_width,
 		&image_height
 	);
 	image.assign(rays.size() * image_channels, 0);
+
+	// SDL setup inspired by:
+	// https://stackoverflow.com/a/35989490/4956731
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+	SDL_CreateWindowAndRenderer(image_width, image_height, 0, &window, &renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+	SDL_RenderPresent(renderer);
+
+	SDL_Event event;
+	bool window_closed = false;
+
 	std::cout << "Ray tracing scene... (enter any input to pause)" << std::endl;
 	for (size_t i = 0; !done && i < rays.size(); i++) {
 		glm::vec3 direction = rays[i].first;
@@ -161,10 +184,26 @@ void raytraceScene()
 			lights,
 			scene_objects
 		);
+		auto color_r = (uint8_t)round(255.0 * color.r);
+		auto color_g = (uint8_t)round(255.0 * color.g);
+		auto color_b = (uint8_t)round(255.0 * color.b);
+
 		int index = rays[i].second;
-		image[index * image_channels] = (char)(255 * color.r);
-		image[index * image_channels + 1] = (char)(255 * color.g);
-		image[index * image_channels + 2] = (char)(255 * color.b);
+		image[index * image_channels] = (unsigned char)color_r;
+		image[index * image_channels + 1] = (unsigned char)color_g;
+		image[index * image_channels + 2] = (unsigned char)color_b;
+
+		// close window if requested
+		if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
+			quitSDL(window, renderer);
+			window_closed = true;
+		}
+		// update image with new pixel value
+		if (!window_closed) {
+			SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
+			SDL_RenderDrawPoint(renderer, index % image_width, index / image_width);
+			SDL_RenderPresent(renderer);
+		}
 
 		// indicate progress
 		printProgress(i, rays.size());
@@ -182,6 +221,10 @@ void raytraceScene()
 		std::cout << " Press enter to save final image.";
 	}
 	std::cout << std::endl;
+
+	if (!window_closed) {
+		quitSDL(window, renderer);
+	}
 }
 
 void waitForInput()
@@ -223,8 +266,8 @@ void saveImage()
 
 	stbi_write_bmp(
 		(renders_dir / fs::path(filename)).c_str(),
-		(int)image_width,
-		(int)image_height,
+		image_width,
+		image_height,
 		image_channels,
 		image.data()
 	);

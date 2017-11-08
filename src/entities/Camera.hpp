@@ -13,8 +13,8 @@ private:
 	float fov_y; // radians
 	float focal_length;
 	float aspect_ratio; // width / height
-	unsigned long pixel_width;
-	unsigned long pixel_height;
+	unsigned int pixel_width;
+	unsigned int pixel_height;
 	// randomly-ordered vector, containing pairs of:
 	//  - ray direction vector
 	//  - int indicating position in image
@@ -24,8 +24,8 @@ public:
 	Camera(const glm::vec3& position, float fov_y, float focal_length, float aspect_ratio);
 	glm::vec3 getPosition() const;
 	const std::vector<std::pair<glm::vec3, int>>& getRays(
-		unsigned long* const& pixel_width,
-		unsigned long* const& pixel_height
+		unsigned int* const& pixel_width,
+		unsigned int* const& pixel_height
 	) const;
 };
 
