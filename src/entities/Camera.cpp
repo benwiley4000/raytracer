@@ -38,8 +38,8 @@ Camera::Camera(
 					glm::vec3(bottom_left.x + col, bottom_left.y + row, bottom_left.z) -
 						this->position
 				),
-				// position in image
-				row * this->pixel_width + col
+				// position in image (smaller y at top for image)
+				(this->pixel_height - row - 1) * this->pixel_width + col
 			);
 		}
 	}
