@@ -61,7 +61,7 @@ glm::vec3 getColorForRay(
 				reflection_unit_vector.x * viewer_unit_vector.x +
 					reflection_unit_vector.y * viewer_unit_vector.y +
 					reflection_unit_vector.z * viewer_unit_vector.z;
-			reflection_dot_viewer = std::max(reflection_dot_viewer, 0.0f); // clamp7
+			reflection_dot_viewer = std::max(reflection_dot_viewer, 0.0f); // clamp
 
 			accumulated_color += light.getColor() *
 				(
