@@ -23,7 +23,7 @@ glm::vec3 getColorForRay(
 	float temp_t;
 	glm::vec3 temp_normal;
 	for (Object3D* const& object : scene_objects) {
-		if (object->doesRayIntersect(origin, direction, &temp_t, &temp_normal)) {
+		if (object->doesRayIntersect(origin, direction, &temp_t, &temp_normal) && temp_t < t) {
 			t = temp_t;
 			normal = temp_normal;
 			illuminated_object = object;
