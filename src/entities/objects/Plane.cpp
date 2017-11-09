@@ -1,4 +1,5 @@
 #include <glm/glm.hpp>
+#include <cmath>
 
 #include <src/constants.hpp>
 
@@ -40,6 +41,11 @@ bool Plane::doesRayIntersect(
 		this->normal.y * direction.y +
 		this->normal.z * direction.z;
 
-	*t = -(normal_dot_origin + normal_dot_position) / normal_dot_direction;
-	return *t >= t_threshold;
+	// negative sign negated since camera looks down negative-Z axis
+	// (thanks https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+	// for the tip)
+	// TODO: take look direction into account to handle general case
+	*t = (normal_dot_origin + normal_dot_position) / normal_dot_direction;
+
+	return *t >= t_threshold && !std::isnan(*t);
 }

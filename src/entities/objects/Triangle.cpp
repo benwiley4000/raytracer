@@ -1,4 +1,5 @@
 #include <glm/glm.hpp>
+#include <cmath>
 
 #include <src/constants.hpp>
 
@@ -67,36 +68,41 @@ bool Triangle::doesRayIntersect(
 	                           this->normal.y * direction.y +
 	                           this->normal.z * direction.z;
 
-	*t = -(normal_dot_origin + normal_dot_position) / normal_dot_direction;
-	if (*t < t_threshold) {
+	// negative sign negated since camera looks down negative-Z axis
+	// (thanks https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+	// for the tip)
+	// TODO: take look direction into account to handle general case
+	*t = (normal_dot_origin + normal_dot_position) / normal_dot_direction;
+	if (*t < t_threshold || std::isnan(*t)) {
 		return false;
 	}
 
 	glm::vec3 point3 = origin + direction * *t;
+
 	glm::vec2 point2;
 
 	glm::vec2 projected_vertex1;
 	glm::vec2 projected_vertex2;
 	glm::vec2 projected_vertex3;
-	bool all_x_equal = this->vertex1->x == this->vertex2->x == this->vertex3->x;
-	bool all_y_equal = this->vertex1->y == this->vertex2->y == this->vertex3->y;
+	bool all_x_equal = this->vertex1->x == this->vertex2->x && this->vertex1->x == this->vertex3->x;
+	bool all_y_equal = this->vertex1->y == this->vertex2->y && this->vertex1->y == this->vertex3->y;
 	if (all_x_equal) {
 		// x = 0
 		projected_vertex1 = glm::vec2(this->vertex1->y, this->vertex1->z);
 		projected_vertex2 = glm::vec2(this->vertex2->y, this->vertex2->z);
-		projected_vertex3 = glm::vec2(this->vertex2->y, this->vertex2->z);
+		projected_vertex3 = glm::vec2(this->vertex3->y, this->vertex3->z);
 		point2 = glm::vec2(point3.y, point3.z);
 	} else if (all_y_equal) {
 		// y = 0
 		projected_vertex1 = glm::vec2(this->vertex1->x, this->vertex1->z);
 		projected_vertex2 = glm::vec2(this->vertex2->x, this->vertex2->z);
-		projected_vertex3 = glm::vec2(this->vertex2->x, this->vertex2->z);
+		projected_vertex3 = glm::vec2(this->vertex3->x, this->vertex3->z);
 		point2 = glm::vec2(point3.x, point3.z);
 	} else {
 		// z = 0
 		projected_vertex1 = glm::vec2(this->vertex1->x, this->vertex1->y);
 		projected_vertex2 = glm::vec2(this->vertex2->x, this->vertex2->y);
-		projected_vertex3 = glm::vec2(this->vertex2->x, this->vertex2->y);
+		projected_vertex3 = glm::vec2(this->vertex3->x, this->vertex3->y);
 		point2 = glm::vec2(point3.x, point3.y);
 	}
 
@@ -127,7 +133,7 @@ bool Triangle::doesRayIntersect(
 	*normal = this->normal;
 
 	// Is the plane intersection point actually in the triangle?
-	return 0 <= u < 1 && 0 <= v < 1;
+	return 0 <= u && u < 1 && 0 <= v && v < 1;
 }
 
 void Triangle::setNormal()
