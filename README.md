@@ -6,7 +6,7 @@ Works on macOS and Linux. Should work for Windows, but not recently tested.
 
 ## Features
 
-TBA
+Pick a scene to ray cast, watch it be traced in real time, and save it to file!
 
 ## Specifying scenes
 
