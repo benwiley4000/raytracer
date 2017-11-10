@@ -6,7 +6,7 @@
 
 Load a 3D scene file and render a 2D image using ray tracing.
 
-But originally for COMP 371 Computer Graphics at Concordia University in Montréal, Québec.
+Built originally for COMP 371 Computer Graphics at Concordia University in Montréal, Québec.
 
 Works on macOS and Linux. Should work for Windows, but not recently tested.
 
