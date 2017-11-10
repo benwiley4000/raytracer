@@ -29,17 +29,11 @@ bool Plane::doesRayIntersect(
 	// formula based on slides 11-12 at:
 	// http://poullis.org/courses/2017/Fall/COMP371/resources/Lecture%2016_%20Ray%20Tracing_Geometric%20Queries.pdf
 
-	float normal_dot_position = this->normal.x * this->position.x +
-		this->normal.y * this->position.y +
-		this->normal.z * this->position.z;
+	float normal_dot_position = glm::dot(this->normal, this->position);
 
-	float normal_dot_origin = this->normal.x * origin.x +
-		this->normal.y * origin.y +
-		this->normal.z * origin.z;
+	float normal_dot_origin = glm::dot(this->normal, origin);
 
-	float normal_dot_direction = this->normal.x * direction.x +
-		this->normal.y * direction.y +
-		this->normal.z * direction.z;
+	float normal_dot_direction = glm::dot(this->normal, direction);
 
 	// negative sign negated since camera looks down negative-Z axis
 	// (thanks https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution

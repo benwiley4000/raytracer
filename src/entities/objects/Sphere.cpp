@@ -51,7 +51,7 @@ bool Sphere::doesRayIntersect(
 	glm::vec3 l = this->position - origin;
 	float tca = l.x * direction.x + l.y *direction.y + l.z * direction.z;
 	if (tca <= t_threshold) return false;
-	float d2 = l.x * l.x + l.y * l.y + l.z * l.z - tca * tca;
+	float d2 = glm::dot(l, l) - pow(tca, 2);
 	if (d2 > this->radius * this->radius) return false;
 	double thc = sqrt(this->radius * this->radius - d2);
 	*t = std::min(tca - thc, tca + thc);
