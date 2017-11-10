@@ -1,5 +1,9 @@
 # raytracer
 
+*This ray tracer is extremely in-progress and inefficient - not recommended for use!*
+
+![](renders/sample_render_1.png) ![](renders/sample_render_2.png) ![](renders/sample_render_3.png) ![](renders/sample_render_4.png) ![](renders/sample_render_5.png) ![](renders/sample_render_6.png) ![](renders/sample_render_7.png)
+
 Load a 3D scene file and render a 2D image using ray tracing.
 
 Works on macOS and Linux. Should work for Windows, but not recently tested.
