@@ -141,8 +141,9 @@ size_t printProgress(const size_t& iterations, const size_t& total)
 	}
 }
 
-void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
+void quitSDL(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture)
 {
+	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -168,9 +169,22 @@ void raytraceScene()
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	SDL_CreateWindowAndRenderer(image_width, image_height, 0, &window, &renderer);
+
+	// Help using texture for display from:
+	// https://stackoverflow.com/a/20091474/4956731
+	SDL_Texture* display = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_RGB888,
+		SDL_TEXTUREACCESS_TARGET,
+		image_width,
+		image_height
+	);
+
+	// render to texture
+	SDL_SetRenderTarget(renderer, display);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
-	SDL_RenderPresent(renderer);
+	SDL_SetRenderTarget(renderer, nullptr);
 
 	SDL_Event event;
 	bool window_closed = false;
@@ -195,19 +209,24 @@ void raytraceScene()
 
 		// close window if requested
 		if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
-			quitSDL(window, renderer);
+			quitSDL(window, renderer, display);
 			window_closed = true;
 		}
 		// update image with new pixel value
 		if (!window_closed) {
+			// render to texture
+			SDL_SetRenderTarget(renderer, display);
+
 			SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
 			SDL_RenderDrawPoint(renderer, index % image_width, index / image_width);
-			SDL_RenderPresent(renderer);
-			// draw point and swap buffer a second time to make sure both buffers
-			// have the same content. in effect we're only really ever displaying one
-			// buffer for more than a microsecond.
-			// TODO: that's a weird hack! use a streaming texture?
-			SDL_RenderDrawPoint(renderer, index % image_width, index / image_width);
+
+			// unset texture target
+			SDL_SetRenderTarget(renderer, nullptr);
+
+			// copy texture to renderer
+			SDL_RenderCopy(renderer, display, nullptr, nullptr);
+
+			// render on screen
 			SDL_RenderPresent(renderer);
 		}
 
@@ -229,7 +248,7 @@ void raytraceScene()
 	std::cout << std::endl;
 
 	if (!window_closed) {
-		quitSDL(window, renderer);
+		quitSDL(window, renderer, display);
 	}
 }
 
