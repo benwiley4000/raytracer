@@ -73,6 +73,8 @@ bool Triangle::doesRayIntersect(
 
 	glm::vec3 point3 = origin + direction * *t;
 
+	/*
+
 	glm::vec2 point2;
 
 	glm::vec2 projected_vertex1;
@@ -128,6 +130,34 @@ bool Triangle::doesRayIntersect(
 
 	// Is the plane intersection point actually in the triangle?
 	return 0 <= u && u < 1 && 0 <= v && v < 1;
+
+	 */
+
+	// temp solution from:
+	// https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+
+	// Step 2: inside-outside test
+	glm::vec3 C; // vector perpendicular to triangle's plane
+
+	// edge 0
+	glm::vec3 edge0 = *this->vertex2 - *this->vertex1;
+	glm::vec3 vp0 = point3 - *this->vertex1;
+	C = glm::cross(edge0, vp0);
+	if (glm::dot(this->normal, C) < 0) return false; // P is on the right side
+
+	// edge 1
+	glm::vec3 edge1 = *this->vertex3 - *this->vertex2;
+	glm::vec3 vp1 = point3 - *this->vertex2;
+	C = glm::cross(edge1, vp1);
+	if (glm::dot(this->normal, C) < 0)  return false; // P is on the right side
+
+	// edge 2
+	glm::vec3 edge2 = *this->vertex1 - *this->vertex3;
+	glm::vec3 vp2 = point3 - *this->vertex3;
+	C = glm::cross(edge2, vp2);
+	if (glm::dot(this->normal, C) < 0) return false; // P is on the right side;
+
+	return true;
 }
 
 void Triangle::setNormal()
