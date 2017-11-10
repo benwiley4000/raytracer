@@ -203,6 +203,12 @@ void raytraceScene()
 			SDL_SetRenderDrawColor(renderer, color_r, color_g, color_b, 255);
 			SDL_RenderDrawPoint(renderer, index % image_width, index / image_width);
 			SDL_RenderPresent(renderer);
+			// draw point and swap buffer a second time to make sure both buffers
+			// have the same content. in effect we're only really ever displaying one
+			// buffer for more than a microsecond.
+			// TODO: that's a weird hack! use a streaming texture?
+			SDL_RenderDrawPoint(renderer, index % image_width, index / image_width);
+			SDL_RenderPresent(renderer);
 		}
 
 		// indicate progress
