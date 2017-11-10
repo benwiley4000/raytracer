@@ -36,6 +36,6 @@ Beyond the C++ standard library this application relies on:
 ### Other help
 
 * Cross platform CMake setup created using [Hunter](https://github.com/ruslo/hunter)
-* Thanks to this [StackOverflow answer](https://stackoverflow.com/a/35989490/4956731) for helping me display my render with SDL
+* Thanks to this [StackOverflow answer](https://stackoverflow.com/a/35989490/4956731), and also this [other StackOverflow answer](https://stackoverflow.com/a/20091474/4956731), for helping me display my render with SDL
 * Thanks to COMP 371 at Concordia for all the materials helping with various formulas for ray tracing
 * Thanks to Scratchapixel tutorials for good explanations of geometric methods for find ray intersections with [spheres](https://www.scratchapixel.com/code.php?id=3&origin=/lessons/3d-basic-rendering/introduction-to-ray-tracing) and [planes/triangles](https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution).
