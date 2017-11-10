@@ -25,37 +25,39 @@ bool Sphere::doesRayIntersect(
 	glm::vec3* const& normal
 ) const
 {
-	/*
-	// formula based on slides 5-6 at:
-	// http://poullis.org/courses/2017/Fall/COMP371/resources/Lecture%2016_%20Ray%20Tracing_Geometric%20Queries.pdf
-	double b = 2 * (
-		              direction.x * (origin.x - this->position.x) +
-		              direction.y * (origin.y - this->position.y) +
-		              direction.z * (origin.z - this->position.z)
-	              );
-	double c = pow(origin.x - this->position.x, 2) +
-	           pow(origin.y - this->position.y, 2) +
-	           pow(origin.z - this->position.z, 2) -
-	           pow(this->radius, 2);
-	double sqrt_discriminant = sqrt(pow(b, 2) - 4 * c);
-	// get whichever intersection t value is smallest (may be smaller than origin)
-	*t = std::min((-b + sqrt_discriminant) / 2, (-b - sqrt_discriminant) / 2);
-
-
-	*normal = glm::normalize((origin + direction * *t) - this->position);
-
-	return *t >= t_threshold && !std::isnan(*t);
-	*/
-	// temp solution from:
+	// geometric solution based on explation at:
 	// https://www.scratchapixel.com/code.php?id=3&origin=/lessons/3d-basic-rendering/introduction-to-ray-tracing
-	glm::vec3 l = this->position - origin;
-	float tca = glm::dot(l, direction);
-	if (tca <= t_threshold) return false;
-	float d2 = glm::dot(l, l) - pow(tca, 2);
-	if (d2 > this->radius * this->radius) return false;
-	double thc = sqrt(this->radius * this->radius - d2);
-	*t = std::min(tca - thc, tca + thc);
+	// TODO: implement analytic solution based on quadratic formula (previous implementations produced undesired visual artifacts)
 
+	// a vector corresponding to segment from origin to sphere center
+	glm::vec3 vec_to_sphere_center = this->position - origin;
+	// t corresponding to point lying on sphere's center axis
+	float t_center_axis = glm::dot(vec_to_sphere_center, direction);
+	if (t_center_axis < t_threshold) {
+		// if the sphere center is too low we shouldn't declare an intersection
+		return false;
+	}
+	// the square of d, the distance from the sphere center to the cast ray
+	float d_squared =
+		glm::dot(vec_to_sphere_center, vec_to_sphere_center) - pow(t_center_axis, 2);
+	if (d_squared > this->radius * this->radius) {
+		// if d squared is greater than the radius squared, that would push the ray
+		// outside the bounds of the sphere, so no intersection.
+		return false;
+	}
+
+	// there is an intersection!
+
+	// find t increment *just* for the segment between the intersection point
+	// and the center axis
+	auto t_from_point_to_center_axis =
+		(float)sqrt(this->radius * this->radius - d_squared);
+	*t = std::min(
+		t_center_axis - t_from_point_to_center_axis,
+		t_center_axis + t_from_point_to_center_axis
+	);
+
+	// compute normal pointing from sphere center to intersection point
 	*normal = glm::normalize((origin + direction * *t) - this->position);
 
 	return true;
