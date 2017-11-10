@@ -49,7 +49,7 @@ bool Sphere::doesRayIntersect(
 	// temp solution from:
 	// https://www.scratchapixel.com/code.php?id=3&origin=/lessons/3d-basic-rendering/introduction-to-ray-tracing
 	glm::vec3 l = this->position - origin;
-	float tca = l.x * direction.x + l.y *direction.y + l.z * direction.z;
+	float tca = glm::dot(l, direction);
 	if (tca <= t_threshold) return false;
 	float d2 = glm::dot(l, l) - pow(tca, 2);
 	if (d2 > this->radius * this->radius) return false;

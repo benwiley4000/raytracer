@@ -110,11 +110,11 @@ bool Triangle::doesRayIntersect(
 
 	glm::vec2 point_vec = point2 - projected_vertex1;
 
-	float zero_dot_zero = v0[0] * v0[0] + v0[1] * v0[1];
-	float zero_dot_one = v0[0] * v1[0] + v0[1] * v1[1];
-	float zero_dot_point_vec = v0[0] * point_vec[0] + v0[1] * point_vec[1];
-	float one_dot_one = v1[0] * v1[0] + v1[1] * v1[1];
-	float one_dot_point_vec = v1[0] * point_vec[1] + v1[1] * point_vec[1];
+	float zero_dot_zero = glm::dot(v0, v0);
+	float zero_dot_one = glm::dot(v0, v1);
+	float zero_dot_point_vec = glm::dot(v0, point_vec);
+	float one_dot_one = glm::dot(v1, v1);
+	float one_dot_point_vec = glm::dot(v1, point_vec);
 
 	// Compute barycentric coordinates
 	float inverse_denominator =
