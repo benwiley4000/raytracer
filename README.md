@@ -1,5 +1,7 @@
 # raytracer
 
+Loads scene descriptions and progressively outputs 3D renders.
+
 *This ray tracer is extremely in-progress and inefficient - not recommended for use!*
 
 ![](renders/sample_render_1.png) ![](renders/sample_render_2.png) ![](renders/sample_render_3.png) ![](renders/sample_render_4.png) ![](renders/sample_render_5.png) ![](renders/sample_render_6.png) ![](renders/sample_render_7.png)
